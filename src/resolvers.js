@@ -15,10 +15,8 @@ const resolvers = {
   },
   Query: {
     product(root, {id}) {
-      console.log(id);
       return {
-        prices(root, {display}) {
-          console.log(display);
+        prices({display}) {
           if (display === 'A') {
             return [
               {
