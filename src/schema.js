@@ -15,14 +15,14 @@ const typeDefs = gql`
     savedAmount: Float!
   }
 
-  interface Price {
+  interface PriceInterface {
     price: Float!
     min: Float
     max: Float
     unitType: Unit!
   }
 
-  type SalePrice implements Price {
+  type SalePrice implements PriceInterface {
     price: Float!
     min: Float
     max: Float
@@ -30,42 +30,42 @@ const typeDefs = gql`
     discount: Discount
   }
 
-  type ListPrice implements Price {
+  type ListPrice implements PriceInterface {
     price: Float!
     min: Float
     max: Float
     unitType: Unit!
   }
 
-  type SuggestedRetailPrice implements Price {
+  type SuggestedRetailPrice implements PriceInterface {
     price: Float!
     min: Float
     max: Float
     unitType: Unit!
   }
 
-  type ClearancePrice implements Price {
+  type ClearancePrice implements PriceInterface {
     price: Float!
     min: Float
     max: Float
     unitType: Unit!
   }
 
-  type SmallestPurchasablePrice implements Price {
+  type SmallestPurchasablePrice implements PriceInterface {
     price: Float!
     min: Float
     max: Float
     unitType: Unit!
   }
 
-  type PerItemPrice implements Price {
+  type PerItemPrice implements PriceInterface {
     price: Float!
     min: Float
     max: Float
     unitType: Unit!
   }
 
-  type ConfiguredPrice implements Price {
+  type ConfiguredPrice implements PriceInterface {
     price: Float!
     min: Float
     max: Float
@@ -76,7 +76,7 @@ const typeDefs = gql`
     restrictionReason: String!
   }
 
-  union Prices =
+  union Price =
       SalePrice
     | ListPrice
     | SuggestedRetailPrice
@@ -98,7 +98,7 @@ const typeDefs = gql`
 
   type Product {
     id: ProductId
-    prices(display: Display): [Prices]!
+    prices(display: Display): [Price]!
   }
 
   type Query {

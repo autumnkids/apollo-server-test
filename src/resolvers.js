@@ -3,12 +3,12 @@ const data = {
 };
 
 const resolvers = {
-  Prices: {
+  Price: {
     __resolveType(obj) {
       return obj.__typename;
     }
   },
-  Price: {
+  PriceInterface: {
     __resolveType(obj) {
       return 'SalePrice';
     }
