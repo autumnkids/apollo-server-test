@@ -1,6 +1,8 @@
 const {ApolloServer, gql} = require('apollo-server');
-const {typeDefs} = require('./src/schema');
-const {resolvers} = require('./src/resolvers');
+const requireText = require('require-text');
+const {resolvers} = require('./resolvers');
+
+const typeDefs = requireText('./schema.graphql', require);
 
 // In the most basic sense, the ApolloServer can be started
 // by passing type definitions (typeDefs) and the resolvers
@@ -9,6 +11,6 @@ const server = new ApolloServer({typeDefs, resolvers});
 
 // This `listen` method launches a web-server.  Existing apps
 // can utilize middleware options, which we'll discuss later.
-server.listen().then(({url}) => {
+server.listen({port: 4000}).then(({url}) => {
   console.log(`🚀  Server ready at ${url}`);
 });

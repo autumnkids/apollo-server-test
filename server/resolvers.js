@@ -1,6 +1,4 @@
-const data = {
-  salePrice: 10
-};
+const {products} = require('./data');
 
 const resolvers = {
   Price: {
@@ -15,48 +13,28 @@ const resolvers = {
   },
   Query: {
     product(root, {id}) {
-      return {
-        prices({display}) {
-          if (display === 'A') {
+      if (id === 'NormalProduct') {
+        const {normalProduct} = products;
+        return {
+          id() {
+            return normalProduct.id;
+          },
+          prices() {
+            const savedAmount = normalProduct.listPrice - normalProduct.salePrice;
             return [
               {
                 __typename: 'SalePrice',
-                price: 10,
-                min: 5,
-                max: 20,
-                unitType: 'REGULAR'
-              },
-              {
-                __typename: 'ListPrice',
-                price: 20,
-                unitType: 'REGULAR'
-              },
-              {
-                __typename: 'ClearancePrice',
-                price: 5,
-                unitType: 'REGULAR'
-              },
-              {
-                __typename: 'PerItemPrice',
-                price: 2.5,
-                unitType: 'SET'
-              }
-            ];
-          } else if (display === 'B') {
-            return [
-              {
-                __typename: 'SalePrice',
-                price: 100,
-                unitType: 'REGULAR'
-              },
-              {
-                __typename: 'RestrictedPrice',
-                restrictionReason: 'Restriced'
+                price: normalProduct.salePrice,
+                unitType: 'REGULAR',
+                discount: {
+                  savedAmount,
+                  savedPercent: savedAmount / normalProduct.listPrice
+                }
               }
             ];
           }
-        }
-      };
+        };
+      }
     }
   }
 };
