@@ -16,7 +16,6 @@ enum PriceDiscriptor {
   ConfiguredPrice
   PricePerItem
   UnitPrice
-  RestrictedPrice
 }
 
 enum SaleEnum {
@@ -30,11 +29,10 @@ interface PriceInterface {
   saleType: SaleEnum
 }
 
-type BasePrice implements PriceInterface {
+type SimplePrice implements PriceInterface {
   price: Float!
   unitType: Unit!
   priceDiscriptor: PriceDiscriptor!
-  savedPercent: Float
   saleType: SaleEnum
 }
 
@@ -46,11 +44,15 @@ type RangePrice implements PriceInterface {
   saleType: SaleEnum
 }
 
+type PriceDiscount {
+  savedPercent: Float!
+}
+
 type RestrictedPrice {
   restrictionReason: String!
 }
 
-union Price = BasePrice | RangePrice | RestrictedPrice
+union Price = SimplePrice | RangePrice | RestrictedPrice | PriceDiscount
 
 enum PriceUseCase {
   BrowseProductCard
