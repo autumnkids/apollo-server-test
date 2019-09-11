@@ -91,6 +91,7 @@ enum ProductId {
   RugProduct
   ClearanceProduct
   KitProduct
+  restrictedProduct
 }
 
 type Product {

@@ -1,41 +1,41 @@
-const normalProduct = {
-  id: 'normalProduct',
+const NormalProduct = {
+  id: 'NormalProduct',
   salePrice: 100,
   listPrice: 200,
   maxPrice: 0,
   suggestedRetailPrice: 210
 };
 
-const productWithClearanceAvailable = {
-  id: 'productWithClearanceAvailable',
+const ProductWithClearanceAvailable = {
+  id: 'ProductWithClearanceAvailable',
   salePrice: 100,
   listPrice: 200,
   clearanceMin: 50,
   clearanceMax: 100
 };
 
-const productWithSets = {
-  id: 'productWithSets',
+const ProductWithSets = {
+  id: 'ProductWithSets',
   salePrice: 20,
   minimumOrderQuantity: 2
 };
 
-const flooringProduct = {
-  id: 'flooringProduct',
+const FlooringProduct = {
+  id: 'FlooringProduct',
   salePrice: 100,
   listPrice: 200,
   quantityPerBox: 20
 };
 
-const rugProduct = {
-  id: 'rugProduct',
+const RugProduct = {
+  id: 'RugProduct',
   salePrice: 50,
   listPrice: 100,
   maxPrice: 200
 };
 
-const clearanceProduct = {
-  id: 'clearanceProduct',
+const ClearanceProduct = {
+  id: 'ClearanceProduct',
   salePrice: 100,
   clearanceItems: [
     {
@@ -49,8 +49,8 @@ const clearanceProduct = {
   ]
 };
 
-const kitProduct = {
-  id: 'kitProduct',
+const KitProduct = {
+  id: 'KitProduct',
   salePrice: 100,
   children: [
     {
@@ -86,12 +86,18 @@ const kitProduct = {
   ]
 };
 
+const RestrictedProduct = {
+  id: 'RestrictedProduct',
+  restrictionReason: 'See Price In Cart'
+};
+
 exports.products = {
-  normalProduct,
-  productWithClearanceAvailable,
-  productWithSets,
-  flooringProduct,
-  rugProduct,
-  clearanceProduct,
-  kitProduct
+  NormalProduct,
+  ProductWithClearanceAvailable,
+  ProductWithSets,
+  FlooringProduct,
+  RugProduct,
+  ClearanceProduct,
+  KitProduct,
+  RestrictedProduct
 };
