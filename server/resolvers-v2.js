@@ -38,10 +38,11 @@ const resolvePricingData = product => {
         }
         const salePrice = {
           unitType,
-          priceDiscriptor: 'SalePrice'
+          priceDescriptor: 'SalePrice'
         };
         if (savedAmount) {
-          savedPercent = savedAmount / product.listPrice;
+          savedPercent = savedAmount / product.listPrice * 100;
+          salePrice.priceDescriptor = 'OnSalePrice';
         }
         if (product.maxPrice || maxPrice) {
           salePrice.min = price;
@@ -54,19 +55,19 @@ const resolvePricingData = product => {
         return {
           price: product[key],
           unitType,
-          priceDiscriptor: 'ListPrice'
+          priceDescriptor: 'ListPrice'
         };
       } else if (key === 'suggestedRetailPrice') {
         return {
           price: product[key],
           unitType,
-          priceDiscriptor: 'SuggestedRetailPrice'
+          priceDescriptor: 'SuggestedRetailPrice'
         };
       } else if (key === 'clearanceMin') {
         const clearancePrice = {
           min: product[key],
           unitType,
-          priceDiscriptor: 'ClearancePrice'
+          priceDescriptor: 'ClearancePrice'
         };
         if (product.clearanceMax) {
           clearancePrice.max = product.clearanceMax;
@@ -76,18 +77,18 @@ const resolvePricingData = product => {
         return {
           price: product.salePrice / 2,
           unitType,
-          priceDiscriptor: 'PerItemPrice'
+          priceDescriptor: 'PerItemPrice'
         };
       } else if (key === 'quantityPerBox') {
         return {
           price: product.salePrice,
           unitType,
-          priceDiscriptor: 'SmallestPurchasablePrice'
+          priceDescriptor: 'SmallestPurchasablePrice'
         };
       } else if (key === 'restrictionReason') {
         return {
           restrictionReason: product[key],
-          priceDiscriptor: 'RestrictedPrice'
+          priceDescriptor: 'RestrictedPrice'
         };
       }
     })

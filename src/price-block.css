@@ -1,0 +1,12 @@
+.PriceBlock-salePrice {
+  font-size: 2rem;
+}
+
+.PriceBlock-strikethrough {
+  text-decoration: line-through;
+}
+
+.PriceBlock-secondaryPrice {
+  margin: 0;
+  display: block;
+}

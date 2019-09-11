@@ -7,7 +7,8 @@ enum Unit {
   REGULAR
 }
 
-enum PriceDiscriptor {
+enum PriceDescriptor {
+  OnSalePrice
   SalePrice
   ListPrice
   SuggestedRetailPrice
@@ -24,23 +25,19 @@ enum SaleEnum {
 }
 
 interface PriceInterface {
-  priceDiscriptor: PriceDiscriptor!
+  priceDescriptor: PriceDescriptor!
   unitType: Unit!
   saleType: SaleEnum
 }
 
 type SimplePrice implements PriceInterface {
   price: Float!
-  unitType: Unit!
-  priceDiscriptor: PriceDiscriptor!
   saleType: SaleEnum
 }
 
 type RangePrice implements PriceInterface {
   min: Float!
   max: Float
-  unitType: Unit!
-  priceDiscriptor: PriceDiscriptor!
   saleType: SaleEnum
 }
 

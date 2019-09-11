@@ -43,7 +43,7 @@ const resolvePricingData = product => {
         if (savedAmount) {
           salePrice.discount = {
             savedAmount,
-            savedPercent: savedAmount / product.listPrice
+            savedPercent: savedAmount / product.listPrice * 100
           };
         }
         if (product.maxPrice || maxPrice) {
