@@ -118,7 +118,7 @@ const resolvers = {
               }
               return {
                 price: product.salePrice,
-                unitType: 'AREA'
+                unitType: 'REGULAR'
               };
             },
             listPrice() {
@@ -195,7 +195,7 @@ const resolvers = {
               if (product.listPrice - product.salePrice > 0) {
                 return {
                   savedPercent:
-                    (product.listPrice - product.salePrice) / product.listPrice
+                    (product.listPrice - product.salePrice) / product.listPrice * 100
                 };
               }
               return null;

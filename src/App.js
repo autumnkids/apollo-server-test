@@ -1,7 +1,7 @@
 import React from 'react';
 import ApolloClient from 'apollo-boost';
 import {ApolloProvider} from '@apollo/react-hooks';
-import PriceBlock from './price-block-with-graphql-v1';
+import ProductBlock from './approach1/product-block';
 
 const client = new ApolloClient({
   uri: 'http://localhost:4000'
@@ -9,7 +9,7 @@ const client = new ApolloClient({
 
 const App = () => (
   <ApolloProvider client={client}>
-    <PriceBlock />
+    <ProductBlock />
   </ApolloProvider>
 );
 
