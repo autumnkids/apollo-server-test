@@ -7,81 +7,54 @@ enum Unit {
   REGULAR
 }
 
-type Discount {
-  savedPercent: Float!
-  savedAmount: Float!
+enum Sale {
+  ON_SALE
+  CLOSEOUT
 }
 
 interface PriceInterface {
-  price: Float!
-  min: Float
-  max: Float
   unitType: Unit!
 }
 
-type SalePrice implements PriceInterface {
+type SimplePrice implements PriceInterface {
   price: Float!
-  min: Float
-  max: Float
-  unitType: Unit!
-  discount: Discount
 }
 
-type ListPrice implements PriceInterface {
-  price: Float!
-  min: Float
+type RangePrice implements PriceInterface {
+  min: Float!
   max: Float
-  unitType: Unit!
-}
-
-type SuggestedRetailPrice implements PriceInterface {
-  price: Float!
-  min: Float
-  max: Float
-  unitType: Unit!
-}
-
-type ClearancePrice implements PriceInterface {
-  price: Float!
-  min: Float
-  max: Float
-  unitType: Unit!
-}
-
-type SmallestPurchasablePrice implements PriceInterface {
-  price: Float!
-  min: Float
-  max: Float
-  unitType: Unit!
-}
-
-type PerItemPrice implements PriceInterface {
-  price: Float!
-  min: Float
-  max: Float
-  unitType: Unit!
-}
-
-type ConfiguredPrice implements PriceInterface {
-  price: Float!
-  min: Float
-  max: Float
-  unitType: Unit!
 }
 
 type RestrictedPrice {
   restrictionReason: String!
 }
 
-union Price =
-    SalePrice
-  | ListPrice
-  | SuggestedRetailPrice
-  | ClearancePrice
-  | SmallestPurchasablePrice
-  | PerItemPrice
-  | ConfiguredPrice
-  | RestrictedPrice
+type PriceDiscount {
+  savedPercent: Float!
+}
+
+union SalePrice = SimplePrice | RangePrice | RestrictedPrice
+
+union ListPrice = SimplePrice
+
+union SuggestedRetailPrice = SimplePrice
+
+union ClearancePrice = SimplePrice | RangePrice
+
+union UnitPrice = SimplePrice
+
+union QuantityPrice = SimplePrice
+
+type Price {
+  salePrice: SalePrice!
+  listPrice: ListPrice
+  suggestedRetailPrice: SuggestedRetailPrice
+  clearancePrice: ClearancePrice
+  unitPrice: UnitPrice!
+  quantityPrice: QuantityPrice!
+  discount: PriceDiscount
+  saleType: Sale
+}
 
 enum ProductId {
   NormalProduct
@@ -96,7 +69,7 @@ enum ProductId {
 
 type Product {
   id: ProductId!
-  prices: [Price]!
+  price: Price!
 }
 
 type Query {

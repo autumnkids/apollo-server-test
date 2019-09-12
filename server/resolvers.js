@@ -43,7 +43,7 @@ const resolvePricingData = product => {
         if (savedAmount) {
           salePrice.discount = {
             savedAmount,
-            savedPercent: savedAmount / product.listPrice * 100
+            savedPercent: (savedAmount / product.listPrice) * 100
           };
         }
         if (product.maxPrice || maxPrice) {
@@ -97,14 +97,51 @@ const resolvePricingData = product => {
 };
 
 const resolvers = {
-  Price: {
+  SalePrice: {
     __resolveType(obj) {
-      return obj.__typename;
+      if (obj.min) {
+        return 'RangePrice';
+      }
+      if (obj.restrictionReason) {
+        return 'RestrictedPrice';
+      }
+      return 'SimplePrice';
+    }
+  },
+  ListPrice: {
+    __resolveType(obj) {
+      return 'SimplePrice';
+    }
+  },
+  SuggestedRetailPrice: {
+    __resolveType(obj) {
+      return 'SimplePrice';
+    }
+  },
+  ClearancePrice: {
+    __resolveType(obj) {
+      if (obj.min) {
+        return 'RangePrice';
+      }
+      return 'SimplePrice';
+    }
+  },
+  UnitPrice: {
+    __resolveType(obj) {
+      return 'SimplePrice';
+    }
+  },
+  QuantityPrice: {
+    __resolveType(obj) {
+      return 'SimplePrice';
     }
   },
   PriceInterface: {
     __resolveType(obj) {
-      return 'SalePrice';
+      if (obj.min) {
+        return 'RangePrice';
+      }
+      return 'SimplePrice';
     }
   },
   Query: {
@@ -113,8 +150,12 @@ const resolvers = {
         id() {
           return id;
         },
-        prices() {
-          return resolvePricingData(products[id]);
+        price() {
+          return {
+            salePrice() {
+              return 0;
+            }
+          };
         }
       };
     }
