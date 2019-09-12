@@ -6,6 +6,13 @@ const NormalProduct = {
   suggestedRetailPrice: 210
 };
 
+const ProductWithMinPrice = {
+  id: 'ProductWithMinPrice',
+  salePrice: 50,
+  minPrice: 50,
+  listPrice: 200
+};
+
 const ProductWithClearanceAvailable = {
   id: 'ProductWithClearanceAvailable',
   salePrice: 100,
@@ -86,6 +93,13 @@ const KitProduct = {
   ]
 };
 
+const OnSaleProduct = {
+  id: 'OnSaleProduct',
+  salePrice: 50,
+  listPrice: 100,
+  saleType: 'ON_SALE'
+};
+
 const RestrictedProduct = {
   id: 'RestrictedProduct',
   restrictionReason: 'See Price In Cart'
@@ -99,5 +113,7 @@ exports.products = {
   RugProduct,
   ClearanceProduct,
   KitProduct,
-  RestrictedProduct
+  RestrictedProduct,
+  ProductWithMinPrice,
+  OnSaleProduct
 };

@@ -10,6 +10,7 @@ enum Unit {
 enum Sale {
   ON_SALE
   CLOSEOUT
+  REGULAR
 }
 
 interface PriceInterface {
@@ -18,11 +19,13 @@ interface PriceInterface {
 
 type SimplePrice implements PriceInterface {
   price: Float!
+  unitType: Unit!
 }
 
 type RangePrice implements PriceInterface {
   min: Float!
   max: Float
+  unitType: Unit!
 }
 
 type RestrictedPrice {
@@ -43,17 +46,20 @@ union ClearancePrice = SimplePrice | RangePrice
 
 union UnitPrice = SimplePrice
 
-union QuantityPrice = SimplePrice
+union PerItemPrice = SimplePrice
+
+union ConfiguredPrice = SimplePrice
 
 type Price {
   salePrice: SalePrice!
   listPrice: ListPrice
   suggestedRetailPrice: SuggestedRetailPrice
   clearancePrice: ClearancePrice
-  unitPrice: UnitPrice!
-  quantityPrice: QuantityPrice!
+  unitPrice: UnitPrice
+  perItemPrice: PerItemPrice
+  configuredPrice: ConfiguredPrice
   discount: PriceDiscount
-  saleType: Sale
+  saleType: Sale!
 }
 
 enum ProductId {
@@ -64,7 +70,13 @@ enum ProductId {
   RugProduct
   ClearanceProduct
   KitProduct
-  restrictedProduct
+  RestrictedProduct
+  ProductWithMinPrice
+  OnSaleProduct
+}
+
+input ProductConfiguration {
+  quantity: Int
 }
 
 type Product {
@@ -73,5 +85,5 @@ type Product {
 }
 
 type Query {
-  product(id: ProductId!): Product!
+  product(id: ProductId!, configuration: ProductConfiguration): Product!
 }

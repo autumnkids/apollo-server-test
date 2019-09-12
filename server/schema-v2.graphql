@@ -68,6 +68,8 @@ enum ProductId {
   RugProduct
   ClearanceProduct
   KitProduct
+  RestrictedProduct
+  ProductWithMinPrice
 }
 
 type Product {

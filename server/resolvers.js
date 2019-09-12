@@ -1,101 +1,5 @@
 const {products} = require('./data');
 
-const getUnitType = ({id, key}) => {
-  switch (id) {
-    case 'ProductWithSets': {
-      if (key === 'minimumOrderQuantity') {
-        return 'SET';
-      }
-      return 'REGULAR';
-    }
-    case 'FlooringProduct':
-      if (key === 'quantityPerBox') {
-        return 'REGULAR';
-      }
-      return 'AREA';
-    default:
-      return 'REGULAR';
-  }
-};
-
-const resolvePricingData = product => {
-  return Object.keys(product)
-    .map(key => {
-      const unitType = getUnitType({id: product.id, key});
-      if (key === 'salePrice') {
-        const savedAmount = product.listPrice
-          ? product.listPrice - product.salePrice
-          : 0;
-        let price, maxPrice;
-        if (product.quantityPerBox) {
-          price = product[key] / product.quantityPerBox;
-        } else if (product.clearanceItems) {
-          price = product.clearanceItems[0].price;
-          maxPrice = product.clearanceItems[1].price;
-        } else {
-          price = product[key];
-        }
-        const salePrice = {
-          __typename: 'SalePrice',
-          price,
-          unitType
-        };
-        if (savedAmount) {
-          salePrice.discount = {
-            savedAmount,
-            savedPercent: (savedAmount / product.listPrice) * 100
-          };
-        }
-        if (product.maxPrice || maxPrice) {
-          salePrice.min = price;
-          salePrice.max = product.maxPrice || maxPrice;
-        }
-        return salePrice;
-      } else if (key === 'listPrice') {
-        return {
-          __typename: 'ListPrice',
-          price: product[key],
-          unitType
-        };
-      } else if (key === 'suggestedRetailPrice') {
-        return {
-          __typename: 'SuggestedRetailPrice',
-          price: product[key],
-          unitType
-        };
-      } else if (key === 'clearanceMin') {
-        const clearancePrice = {
-          __typename: 'ClearancePrice',
-          price: product[key],
-          min: product[key],
-          unitType
-        };
-        if (product.clearanceMax) {
-          clearancePrice.max = product.clearanceMax;
-        }
-        return clearancePrice;
-      } else if (key === 'minimumOrderQuantity') {
-        return {
-          __typename: 'PerItemPrice',
-          price: product.salePrice / 2,
-          unitType
-        };
-      } else if (key === 'quantityPerBox') {
-        return {
-          __typename: 'SmallestPurchasablePrice',
-          price: product.salePrice,
-          unitType
-        };
-      } else if (key === 'restrictionReason') {
-        return {
-          __typename: 'RestrictedPrice',
-          restrictionReason: product[key]
-        };
-      }
-    })
-    .filter(Boolean);
-};
-
 const resolvers = {
   SalePrice: {
     __resolveType(obj) {
@@ -131,7 +35,12 @@ const resolvers = {
       return 'SimplePrice';
     }
   },
-  QuantityPrice: {
+  PerItemPrice: {
+    __resolveType(obj) {
+      return 'SimplePrice';
+    }
+  },
+  ConfiguredPrice: {
     __resolveType(obj) {
       return 'SimplePrice';
     }
@@ -145,15 +54,157 @@ const resolvers = {
     }
   },
   Query: {
-    product(root, {id}) {
+    product(
+      root,
+      {
+        id,
+        configuration: {quantity}
+      }
+    ) {
       return {
         id() {
           return id;
         },
         price() {
+          const product = products[id];
           return {
             salePrice() {
-              return 0;
+              if (product.restrictionReason) {
+                return {
+                  restrictionReason: product.restrictionReason
+                };
+              }
+              if (product.clearanceItems) {
+                let min = 9999,
+                  max = -9999;
+                product.clearanceItems.forEach(item => {
+                  if (item.price < min) {
+                    min = item.price;
+                  }
+                  if (item.price > max) {
+                    max = item.price;
+                  }
+                });
+                if (min < max) {
+                  return {
+                    min,
+                    max,
+                    unitType: 'REGULAR'
+                  };
+                }
+                return {
+                  min,
+                  unitType: 'REGULAR'
+                };
+              }
+              if (product.maxPrice) {
+                return {
+                  min: product.salePrice,
+                  max: product.maxPrice,
+                  unitType: 'REGULAR'
+                };
+              }
+              if (product.minPrice) {
+                return {
+                  min: product.minPrice,
+                  unitType: 'REGULAR'
+                };
+              }
+              if (product.quantityPerBox) {
+                return {
+                  price: product.salePrice / product.quantityPerBox,
+                  unitType: 'AREA'
+                };
+              }
+              return {
+                price: product.salePrice,
+                unitType: 'AREA'
+              };
+            },
+            listPrice() {
+              if (product.listPrice) {
+                const price = product.quantityPerBox
+                  ? product.listPrice / product.quantityPerBox
+                  : product.listPrice;
+                return {
+                  price,
+                  unitType: product.quantityPerBox ? 'AREA' : 'REGULAR'
+                };
+              }
+              return null;
+            },
+            suggestedRetailPrice() {
+              if (product.suggestedRetailPrice) {
+                return {
+                  price: product.suggestedRetailPrice,
+                  unitType: product.quantityPerBox ? 'AREA' : 'REGULAR'
+                };
+              }
+              return null;
+            },
+            clearancePrice() {
+              if (product.clearanceMax) {
+                return {
+                  min: product.clearanceMin,
+                  max: product.clearanceMax,
+                  unitType: product.quantityPerBox ? 'AREA' : 'REGULAR'
+                };
+              }
+              if (product.clearanceMin) {
+                return {
+                  min: product.clearanceMin,
+                  unitType: product.quantityPerBox ? 'AREA' : 'REGULAR'
+                };
+              }
+              if (product.clearancePrice) {
+                return {
+                  price: product.clearancePrice,
+                  unitType: product.quantityPerBox ? 'AREA' : 'REGULAR'
+                };
+              }
+              return null;
+            },
+            unitPrice() {
+              if (product.salePrice) {
+                return {
+                  price: product.salePrice,
+                  unitType: 'REGULAR'
+                };
+              }
+              return null;
+            },
+            perItemPrice() {
+              if (product.minimumOrderQuantity > 1) {
+                return {
+                  price: product.salePrice / product.minimumOrderQuantity,
+                  unitType: 'SET'
+                };
+              }
+              return null;
+            },
+            configuredPrice() {
+              if (quantity) {
+                return {
+                  price: product.salePrice * quantity,
+                  unitType: 'REGULAR'
+                };
+              }
+              return null;
+            },
+            discount() {
+              if (product.listPrice - product.salePrice > 0) {
+                return {
+                  savedPercent:
+                    (product.listPrice - product.salePrice) / product.listPrice
+                };
+              }
+              return null;
+            },
+            saleType() {
+              if (product.saleType) {
+                return product.saleType;
+              }
+              return 'REGULAR';
             }
           };
         }
