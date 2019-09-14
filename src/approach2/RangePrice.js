@@ -1,6 +1,6 @@
 import React from 'react';
 import {gql} from 'apollo-boost';
-import BasePrice from './BasePrice';
+import BasePrice from '../common/base-price';
 
 function FullRangePrice({price}) {
   return (

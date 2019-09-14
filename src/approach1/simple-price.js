@@ -1,5 +1,5 @@
 import React from 'react';
-import BasePrice from './base-price';
+import BasePrice from '../common/base-price';
 import gql from 'graphql-tag';
 
 export const SIMPLE_PRICE_FRAGMENT = gql`

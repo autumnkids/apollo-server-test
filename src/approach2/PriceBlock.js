@@ -2,7 +2,7 @@ import React from 'react';
 import {useQuery} from '@apollo/react-hooks';
 import {gql} from 'apollo-boost';
 import Price from './Price';
-import './price-block.css';
+import '../common/price-block.css';
 
 function SalePriceDisplay({price}) {
   return price ? <Price price={price} /> : null;

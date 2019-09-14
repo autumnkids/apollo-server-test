@@ -10,7 +10,7 @@ import MeasurementPrice, {
   MEASUREMENT_PRICE_FRAGMENT
 } from './measurement-price';
 import ClearancePrice, {CLEARANCE_PRICE_FRAGMENT} from './clearance-price';
-import '../price-block.css';
+import '../common/price-block.css';
 
 export const PRICE_BLOCK_GRAGMENT = gql`
   fragment PriceBlock on Price {
