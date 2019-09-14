@@ -2,7 +2,7 @@ import React from 'react';
 import gql from 'graphql-tag';
 import {useQuery} from '@apollo/react-hooks';
 import PriceBlock, {PRICE_BLOCK_GRAGMENT} from './price-block';
-import ProductSelector from './product-selector';
+import ProductSelector from '../common/product-selector';
 import SquareFootageCalculator, {
   SQUARE_FOOTAGE_CALCULATOR_FRAGMENT
 } from './square-footage-calculator';

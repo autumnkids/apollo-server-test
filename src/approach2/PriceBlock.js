@@ -34,9 +34,9 @@ function PriceBlock({prices}) {
   return (
     <div>
       <SalePriceDisplay price={pricesHash['SalePrice']} />
-      <SuggestedRetailPrice price={pricesHash['SuggestedRetailPrice']} />
-      <ListPrice price={pricesHash['ListPrice']} />
       <OnSalePrice price={pricesHash['OnSalePrice']} />
+      <ListPrice price={pricesHash['ListPrice']} />
+      <SuggestedRetailPrice price={pricesHash['SuggestedRetailPrice']} />
     </div>
   );
 }
