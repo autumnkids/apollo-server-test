@@ -31,11 +31,15 @@ interface PriceInterface {
 }
 
 type SimplePrice implements PriceInterface {
+  priceDescriptor: PriceDescriptor!
+  unitType: Unit!
   price: Float!
   saleType: SaleEnum
 }
 
 type RangePrice implements PriceInterface {
+  priceDescriptor: PriceDescriptor!
+  unitType: Unit!
   min: Float!
   max: Float
   saleType: SaleEnum
