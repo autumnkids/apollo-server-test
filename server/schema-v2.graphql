@@ -56,12 +56,8 @@ type RestrictedPrice {
 union Price = SimplePrice | RangePrice | RestrictedPrice | PriceDiscount
 
 enum PriceUseCase {
-  BrowseProductCard
-  PDPMainPriceBlock
-  SquareFootageCalculator
-  ClearanceOfferLink
-  ShopTheLookPhoto
-  AllAvailablePrices
+  PriceBlock
+  ProductDetails
 }
 
 enum ProductId {
@@ -69,11 +65,13 @@ enum ProductId {
   ProductWithClearanceAvailable
   ProductWithSets
   FlooringProduct
+  WallpaperInDE
   RugProduct
   ClearanceProduct
   KitProduct
   RestrictedProduct
   ProductWithMinPrice
+  OnSaleProduct
 }
 
 type Product {

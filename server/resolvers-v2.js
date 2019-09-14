@@ -1,6 +1,6 @@
-const { products } = require('./data');
+const {products} = require('./data');
 
-const getUnitType = ({ id, key }) => {
+const getUnitType = ({id, key}) => {
   switch (id) {
     case 'ProductWithSets': {
       if (key === 'minimumOrderQuantity') {
@@ -22,7 +22,7 @@ const resolvePricingData = product => {
   let savedPercent;
   const pricingData = Object.keys(product)
     .map(key => {
-      const unitType = getUnitType({ id: product.id, key });
+      const unitType = getUnitType({id: product.id, key});
       if (key === 'salePrice') {
         const savedAmount = product.listPrice
           ? product.listPrice - product.salePrice
@@ -41,12 +41,14 @@ const resolvePricingData = product => {
           priceDescriptor: 'SalePrice'
         };
         if (savedAmount) {
-          savedPercent = savedAmount / product.listPrice * 100;
+          savedPercent = (savedAmount / product.listPrice) * 100;
           salePrice.priceDescriptor = 'OnSalePrice';
         }
         if (product.maxPrice || maxPrice) {
           salePrice.min = price;
           salePrice.max = product.maxPrice || maxPrice;
+        } else if (product.minPrice) {
+          salePrice.min = product.minPrice;
         } else {
           salePrice.price = price;
         }
@@ -77,7 +79,7 @@ const resolvePricingData = product => {
         return {
           price: product.salePrice / 2,
           unitType,
-          priceDescriptor: 'PerItemPrice'
+          priceDescriptor: 'PricePerItem'
         };
       } else if (key === 'quantityPerBox') {
         return {
@@ -123,7 +125,7 @@ const resolvers = {
     }
   },
   Query: {
-    product(root, { id }) {
+    product(root, {id}) {
       return {
         id() {
           return id;
