@@ -16,13 +16,13 @@ export const SALE_PRICE_FRAGMENT = gql`
 `;
 
 const SalePrice = ({priceInfo}) => {
-  if (priceInfo.price) {
+  if (priceInfo.__typename === 'SimplePrice') {
     return <SimplePrice priceInfo={priceInfo} />;
   }
-  if (priceInfo.min) {
+  if (priceInfo.__typename === 'RangePrice') {
     return <RangePrice priceInfo={priceInfo} />;
   }
-  if (priceInfo.restrictionReason) {
+  if (priceInfo.__typename === 'RestrictedPrice') {
     return <PriceRestriction priceInfo={priceInfo} />;
   }
   return null;

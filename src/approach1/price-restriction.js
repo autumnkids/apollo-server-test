@@ -7,8 +7,8 @@ export const RESTRICTED_PRICE_FRAGMENT = gql`
   }
 `;
 
-const PriceRestriction = ({restrictionInfo}) => (
-  <span>{restrictionInfo.restrictionReason}</span>
+const PriceRestriction = ({priceInfo}) => (
+  <span>{priceInfo.restrictionReason}</span>
 );
 
 export default PriceRestriction;

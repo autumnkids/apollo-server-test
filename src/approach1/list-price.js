@@ -10,7 +10,10 @@ export const LIST_PRICE_FRAGMENT = gql`
 `;
 
 const ListPrice = ({priceInfo}) => (
-  <SimplePrice priceInfo={priceInfo} />
+  <>
+    {'List: '}
+    <SimplePrice priceInfo={priceInfo} />
+  </>
 );
 
 export default ListPrice;

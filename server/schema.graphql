@@ -48,6 +48,8 @@ union UnitPrice = SimplePrice
 
 union PerItemPrice = SimplePrice
 
+union MeasurementPrice = SimplePrice
+
 union ConfiguredPrice = SimplePrice
 
 type Price {
@@ -57,6 +59,7 @@ type Price {
   clearancePrice: ClearancePrice
   unitPrice: UnitPrice
   perItemPrice: PerItemPrice
+  measurementPrice: MeasurementPrice
   configuredPrice: ConfiguredPrice
   discount: PriceDiscount
   saleType: Sale!
@@ -67,6 +70,7 @@ enum ProductId {
   ProductWithClearanceAvailable
   ProductWithSets
   FlooringProduct
+  WallpaperInDE
   RugProduct
   ClearanceProduct
   KitProduct

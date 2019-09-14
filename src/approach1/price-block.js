@@ -6,6 +6,11 @@ import SuggestedRetailPrice, {
   SUGGESTED_RETAIL_PRICE_FARGMENT
 } from './suggested-retail-price';
 import PerItemPrice, {PER_ITEM_PRICE_FRAGMENT} from './per-item-price';
+import MeasurementPrice, {
+  MEASUREMENT_PRICE_FRAGMENT
+} from './measurement-price';
+import ClearancePrice, {CLEARANCE_PRICE_FRAGMENT} from './clearance-price';
+import '../price-block.css';
 
 export const PRICE_BLOCK_GRAGMENT = gql`
   fragment PriceBlock on Price {
@@ -21,6 +26,12 @@ export const PRICE_BLOCK_GRAGMENT = gql`
     perItemPrice {
       ...PerItemPrice
     }
+    measurementPrice {
+      ...MeasurementPrice
+    }
+    clearancePrice {
+      ...ClearancePrice
+    }
     discount {
       savedPercent
     }
@@ -30,24 +41,44 @@ export const PRICE_BLOCK_GRAGMENT = gql`
   ${LIST_PRICE_FRAGMENT}
   ${SUGGESTED_RETAIL_PRICE_FARGMENT}
   ${PER_ITEM_PRICE_FRAGMENT}
+  ${MEASUREMENT_PRICE_FRAGMENT}
+  ${CLEARANCE_PRICE_FRAGMENT}
 `;
 
 const PriceBlock = ({productPrice}) => (
   <>
-    {productPrice.salePrice && <SalePrice priceInfo={productPrice.salePrice} />}
+    {productPrice.salePrice && (
+      <span className="PriceBlock-salePrice">
+        <SalePrice priceInfo={productPrice.salePrice} />
+      </span>
+    )}
     {productPrice.perItemPrice && (
       <PerItemPrice priceInfo={productPrice.perItemPrice} />
     )}
     {productPrice.discount && (
       <>
-        {productPrice.listPrice && (
-          <ListPrice priceInfo={productPrice.listPrice} />
-        )}
-        {productPrice.suggestedRetailPrice && (
-          <SuggestedRetailPrice priceInfo={productPrice.suggestedRetailPrice} />
-        )}
-        {`${productPrice.discount.savedPercent}% Off`}
+        <span className="PriceBlock-strikethrough">
+          {productPrice.listPrice && (
+            <ListPrice priceInfo={productPrice.listPrice} />
+          )}
+          {productPrice.suggestedRetailPrice && (
+            <SuggestedRetailPrice
+              priceInfo={productPrice.suggestedRetailPrice}
+            />
+          )}
+        </span>
+        <span className="PriceBlock-percentageOff">
+          {`${productPrice.discount.savedPercent}% Off`}
+        </span>
       </>
+    )}
+    {productPrice.measurementPrice && (
+      <p>
+        <MeasurementPrice priceInfo={productPrice.measurementPrice} />
+      </p>
+    )}
+    {productPrice.clearancePrice && (
+      <ClearancePrice priceInfo={productPrice.clearancePrice} />
     )}
     {productPrice.saleType !== 'REGULAR' && <p>{productPrice.saleType}</p>}
   </>

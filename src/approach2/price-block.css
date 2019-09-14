@@ -4,9 +4,19 @@
 
 .PriceBlock-strikethrough {
   text-decoration: line-through;
+  color: gray;
 }
 
 .PriceBlock-secondaryPrice {
   margin: 0;
   display: block;
+}
+
+.PriceBlock-percentageOff {
+  color: red;
+}
+
+span,
+p {
+  margin: 0 3px;
 }

@@ -10,7 +10,10 @@ export const SUGGESTED_RETAIL_PRICE_FARGMENT = gql`
 `;
 
 const SuggestedRetailPrice = ({priceInfo}) => (
-  <SimplePrice priceInfo={priceInfo} />
+  <>
+    {'RRP: '}
+    <SimplePrice priceInfo={priceInfo} />
+  </>
 );
 
 export default SuggestedRetailPrice;

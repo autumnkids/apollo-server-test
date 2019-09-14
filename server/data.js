@@ -34,6 +34,12 @@ const FlooringProduct = {
   quantityPerBox: 20
 };
 
+const WallpaperInDE = {
+  id: 'WallpaperInDE',
+  salePrice: 30,
+  quantityPerBox: 5
+};
+
 const RugProduct = {
   id: 'RugProduct',
   salePrice: 50,
@@ -110,6 +116,7 @@ exports.products = {
   ProductWithClearanceAvailable,
   ProductWithSets,
   FlooringProduct,
+  WallpaperInDE,
   RugProduct,
   ClearanceProduct,
   KitProduct,

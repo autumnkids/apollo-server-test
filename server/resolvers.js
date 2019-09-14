@@ -40,6 +40,11 @@ const resolvers = {
       return 'SimplePrice';
     }
   },
+  MeasurementPrice: {
+    __resolveType(obj) {
+      return 'SimplePrice';
+    }
+  },
   ConfiguredPrice: {
     __resolveType(obj) {
       return 'SimplePrice';
@@ -54,13 +59,7 @@ const resolvers = {
     }
   },
   Query: {
-    product(
-      root,
-      {
-        id,
-        configuration: {quantity}
-      }
-    ) {
+    product(root, {id, configuration}) {
       return {
         id() {
           return id;
@@ -110,22 +109,35 @@ const resolvers = {
                   unitType: 'REGULAR'
                 };
               }
-              if (product.quantityPerBox) {
+              if (product.quantityPerBox && id !== 'WallpaperInDE') {
                 return {
                   price: product.salePrice / product.quantityPerBox,
                   unitType: 'AREA'
                 };
               }
+              const price =
+                id !== 'WallpaperInDE' &&
+                configuration &&
+                configuration.quantity
+                  ? product.salePrice * configuration.quantity
+                  : product.salePrice;
               return {
-                price: product.salePrice,
+                price,
                 unitType: 'REGULAR'
               };
             },
             listPrice() {
               if (product.listPrice) {
-                const price = product.quantityPerBox
-                  ? product.listPrice / product.quantityPerBox
-                  : product.listPrice;
+                if (product.quantityPerBox) {
+                  return {
+                    price: product.listPrice / product.quantityPerBox,
+                    unitType: 'AREA'
+                  };
+                }
+                const price =
+                  configuration && configuration.quantity
+                    ? product.listPrice * configuration.quantity
+                    : product.listPrice;
                 return {
                   price,
                   unitType: product.quantityPerBox ? 'AREA' : 'REGULAR'
@@ -135,8 +147,19 @@ const resolvers = {
             },
             suggestedRetailPrice() {
               if (product.suggestedRetailPrice) {
+                if (product.quantityPerBox) {
+                  return {
+                    price:
+                      product.suggestedRetailPrice / product.quantityPerBox,
+                    unitType: 'AREA'
+                  };
+                }
+                const price =
+                  configuration && configuration.quantity
+                    ? product.suggestedRetailPrice * configuration.quantity
+                    : product.suggestedRetailPrice;
                 return {
-                  price: product.suggestedRetailPrice,
+                  price,
                   unitType: product.quantityPerBox ? 'AREA' : 'REGULAR'
                 };
               }
@@ -182,10 +205,23 @@ const resolvers = {
               }
               return null;
             },
-            configuredPrice() {
-              if (quantity) {
+            measurementPrice() {
+              if (id === 'WallpaperInDE' && product.quantityPerBox) {
                 return {
-                  price: product.salePrice * quantity,
+                  price: product.salePrice / product.quantityPerBox,
+                  unitType: 'AREA'
+                };
+              }
+              return null;
+            },
+            configuredPrice() {
+              if (
+                configuration &&
+                configuration.quantity &&
+                product.salePrice
+              ) {
+                return {
+                  price: product.salePrice * configuration.quantity,
                   unitType: 'REGULAR'
                 };
               }
@@ -195,7 +231,9 @@ const resolvers = {
               if (product.listPrice - product.salePrice > 0) {
                 return {
                   savedPercent:
-                    (product.listPrice - product.salePrice) / product.listPrice * 100
+                    ((product.listPrice - product.salePrice) /
+                      product.listPrice) *
+                    100
                 };
               }
               return null;
