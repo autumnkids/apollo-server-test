@@ -1,4 +1,4 @@
-const {products} = require('./data');
+const {products} = require('../common/data');
 
 const resolvers = {
   SalePrice: {
