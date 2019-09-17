@@ -1,0 +1,152 @@
+enum PriceDisplay {
+  DEFAULT
+  MIN
+  MAX
+  PRICE_PER_AREA_UNIT
+  RESTRICTED
+  PRICE_PER_ITEM
+  PREVIOUS
+}
+
+enum Currency {
+  USD
+  CAD
+  GBP
+  EUR
+}
+
+enum Sale {
+  ON_SALE
+  CLOSEOUT
+}
+
+enum DiscountEnum {
+  EVERYDAY
+  CLEARANCE
+  FLASH_DEAL
+  B2B
+  BULK
+  B2B_BULK
+}
+
+enum Unit {
+  LENGTH
+  BOX
+  AREA
+  ROLL
+  SET
+  REGULAR
+}
+
+enum RestrictionReason {
+  SeePriceInCart
+  CallForPrice
+  Reserved
+  FreeWithReview
+}
+
+type DiscountOff {
+  percent: Float
+  amount: Float
+}
+
+type Discount {
+  appliedDiscountType: DiscountEnum
+  everydayDiscount: DiscountOff
+  listDiscount: DiscountOff
+  suggestedRetailDiscount: DiscountOff
+}
+
+interface PriceInterface {
+  currency: Currency!
+  price: Float
+  measurementUnit: Unit!
+}
+
+interface DiscountablePriceInterface {
+  appliedDiscount: Discount
+  saleType: Sale
+}
+
+interface RangePriceInterface {
+  min: Float!
+  max: Float
+}
+
+type CustomerPrice implements PriceInterface & DiscountablePriceInterface & RangePriceInterface {
+  currency: Currency!
+  price: Float
+  measurementUnit: Unit!
+  appliedDiscount: Discount
+  saleType: Sale
+  min: Float!
+  max: Float
+}
+
+type ClearancePrice implements PriceInterface & DiscountablePriceInterface & RangePriceInterface {
+  currency: Currency!
+  price: Float
+  measurementUnit: Unit!
+  appliedDiscount: Discount
+  saleType: Sale
+  min: Float!
+  max: Float
+}
+
+type EverydayPrice implements PriceInterface & RangePriceInterface {
+  currency: Currency!
+  price: Float
+  measurementUnit: Unit!
+  min: Float!
+  max: Float
+}
+
+type ListPrice implements PriceInterface & RangePriceInterface {
+  currency: Currency!
+  price: Float
+  measurementUnit: Unit!
+  min: Float!
+  max: Float
+}
+
+type SuggestedRetailPrice implements PriceInterface & RangePriceInterface {
+  currency: Currency!
+  price: Float
+  measurementUnit: Unit!
+  min: Float!
+  max: Float
+}
+
+type RestrictedPrice implements PriceInterface {
+  currency: Currency!
+  price: Float
+  measurementUnit: Unit!
+  reason: RestrictionReason!
+}
+
+enum ProductId {
+  NormalProduct
+  ProductWithClearanceAvailable
+  ProductWithSets
+  FlooringProduct
+  WallpaperInDE
+  RugProduct
+  ClearanceProduct
+  KitProduct
+  RestrictedProduct
+  ProductWithMinPrice
+  OnSaleProduct
+}
+
+input ProductConfiguration {
+  quantity: Int
+}
+
+type Product {
+  id: ProductId!
+  prices: [PriceInterface]!
+}
+
+type Query {
+  product(id: ProductId!, configuration: ProductConfiguration): Product!
+}
