@@ -21,8 +21,10 @@ const getSalePrice = ({product}) => {
   const suggestedRetailDiscountPercent =
     (suggestedRetailPrice - salePrice) / suggestedRetailPrice;
   let min = null,
-    max = null;
+    max = null,
+    isClearance = false;
   if (product.clearanceItems) {
+    isClearance = true;
     (min = 9999), (max = -9999);
     product.clearanceItems.forEach(item => {
       if (min > item.price) {
@@ -47,7 +49,7 @@ const getSalePrice = ({product}) => {
   }
 
   return {
-    __typename: 'CustomerPrice',
+    __typename: isClearance ? 'ClearancePrice' : 'CustomerPrice',
     currency: 'USD',
     price,
     min,
@@ -95,6 +97,8 @@ const resolvers = {
         prices() {
           const product = products[id];
           const prices = [];
+          const useQuantityPerBox =
+            product.quantityPerBox && id !== 'WallpaperInDE';
 
           if (!product.restrictionReason) {
             const {
@@ -138,11 +142,14 @@ const resolvers = {
             prices.push({
               __typename: 'ListPrice',
               currency: 'USD',
-              price:
-                product.quantityPerBox && id !== 'WallpaperInDE'
-                  ? product.listPrice / product.quantityPerBox
-                  : product.listPrice,
-              display: ['DEFAULT', 'PREVIOUS']
+              price: useQuantityPerBox
+                ? product.listPrice / product.quantityPerBox
+                : product.listPrice,
+              display: [
+                'DEFAULT',
+                'PREVIOUS',
+                useQuantityPerBox ? 'PRICE_PER_AREA_UNIT' : null
+              ].filter(Boolean)
             });
           }
 
@@ -150,11 +157,14 @@ const resolvers = {
             prices.push({
               __typename: 'SuggestedRetailPrice',
               currency: 'USD',
-              price:
-                product.quantityPerBox && id !== 'WallpaperInDE'
-                  ? product.suggestedRetailPrice / product.quantityPerBox
-                  : product.suggestedRetailPrice,
-              display: ['DEFAULT', 'PREVIOUS']
+              price: useQuantityPerBox
+                ? product.suggestedRetailPrice / product.quantityPerBox
+                : product.suggestedRetailPrice,
+              display: [
+                'DEFAULT',
+                'PREVIOUS',
+                useQuantityPerBox ? 'PRICE_PER_AREA_UNIT' : null
+              ].filter(Boolean)
             });
           }
 
@@ -162,21 +172,25 @@ const resolvers = {
             prices.push({
               __typename: 'ClearancePrice',
               currency: 'USD',
-              price:
-                product.quantityPerBox && id !== 'WallpaperInDE'
-                  ? product.clearanceMin / product.quantityPerBox
-                  : product.clearanceMin,
-              display: ['MIN']
+              price: useQuantityPerBox
+                ? product.clearanceMin / product.quantityPerBox
+                : product.clearanceMin,
+              display: [
+                'MIN',
+                useQuantityPerBox ? 'PRICE_PER_AREA_UNIT' : null
+              ].filter(Boolean)
             });
             if (product.clearanceMax) {
               prices.push({
                 __typename: 'ClearancePrice',
                 currency: 'USD',
-                price:
-                  product.quantityPerBox && id !== 'WallpaperInDE'
-                    ? product.clearanceMax / product.quantityPerBox
-                    : product.clearanceMax,
-                display: ['MAX']
+                price: useQuantityPerBox
+                  ? product.clearanceMax / product.quantityPerBox
+                  : product.clearanceMax,
+                display: [
+                  'MAX',
+                  useQuantityPerBox ? 'PRICE_PER_AREA_UNIT' : null
+                ].filter(Boolean)
               });
             }
           }
@@ -186,7 +200,7 @@ const resolvers = {
               __typename: 'CustomerPrice',
               currency: 'USD',
               price: product.salePrice / product.quantityPerBox,
-              display: 'DEFAULT'
+              display: ['DEFAULT', 'PRICE_PER_AREA_UNIT']
             });
           }
 
