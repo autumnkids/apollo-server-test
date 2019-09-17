@@ -1,0 +1,114 @@
+enum PriceDisplay {
+  DEFAULT
+  MIN
+  MAX
+  PRICE_PER_AREA_UNIT
+  RESTRICTED
+  PRICE_PER_ITEM
+  PREVIOUS
+}
+
+enum Currency {
+  USD
+  CAD
+  GBP
+  EUR
+}
+
+enum Sale {
+  ON_SALE
+  CLOSEOUT
+}
+
+enum DiscountEnum {
+  EVERYDAY
+  CLEARANCE
+  FLASH_DEAL
+  B2B
+  BULK
+  B2B_BULK
+}
+
+type DiscountOff {
+  percent: Float
+  amount: Float
+}
+
+type Discount {
+  appliedDiscountType: DiscountEnum
+  everydayDiscount: DiscountOff
+  listDiscount: DiscountOff
+  suggestedRetailDiscount: DiscountOff
+}
+
+interface PriceInterface {
+  currency: Currency!
+  price: Float
+  display: [PriceDisplay]!
+}
+
+interface DiscountableProductPriceInterface {
+  appliedDiscount: Discount
+  saleType: Sale
+}
+
+type CustomerPrice implements PriceInterface & DiscountableProductPriceInterface {
+  currency: Currency!
+  price: Float
+  display: [PriceDisplay]!
+  appliedDiscount: Discount
+  saleType: Sale
+}
+
+type ClearancePrice implements PriceInterface & DiscountableProductPriceInterface {
+  currency: Currency!
+  price: Float
+  display: [PriceDisplay]!
+  appliedDiscount: Discount
+  saleType: Sale
+}
+
+type EverydayPrice implements PriceInterface {
+  currency: Currency!
+  price: Float
+  display: [PriceDisplay]!
+}
+
+type ListPrice implements PriceInterface {
+  currency: Currency!
+  price: Float
+  display: [PriceDisplay]!
+}
+
+type SuggestedRetailPrice implements PriceInterface {
+  currency: Currency!
+  price: Float
+  display: [PriceDisplay]!
+}
+
+enum ProductId {
+  NormalProduct
+  ProductWithClearanceAvailable
+  ProductWithSets
+  FlooringProduct
+  WallpaperInDE
+  RugProduct
+  ClearanceProduct
+  KitProduct
+  RestrictedProduct
+  ProductWithMinPrice
+  OnSaleProduct
+}
+
+input ProductConfiguration {
+  quantity: Int
+}
+
+type Product {
+  id: ProductId!
+  prices: [PriceInterface]!
+}
+
+type Query {
+  product(id: ProductId!, configuration: ProductConfiguration): Product!
+}
