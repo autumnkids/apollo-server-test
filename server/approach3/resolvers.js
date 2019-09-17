@@ -14,12 +14,15 @@ const getSalePrice = ({product}) => {
   const listDiscountAmount = useQuantityPerBox
     ? (listPrice - salePrice) / quantityPerBox
     : listPrice - salePrice;
-  const listDiscountPercent = (listPrice - salePrice) / listPrice;
+  const listDiscountPercent = parseInt(
+    ((listPrice - salePrice) / listPrice) * 100
+  );
   const suggestedRetailDiscountAmount = useQuantityPerBox
     ? (suggestedRetailPrice - salePrice) / quantityPerBox
     : suggestedRetailPrice - salePrice;
-  const suggestedRetailDiscountPercent =
-    (suggestedRetailPrice - salePrice) / suggestedRetailPrice;
+  const suggestedRetailDiscountPercent = parseInt(
+    ((suggestedRetailPrice - salePrice) / suggestedRetailPrice) * 100
+  );
   let min = null,
     max = null,
     isClearance = false;
@@ -83,7 +86,7 @@ const resolvers = {
       return obj.__typename;
     }
   },
-  DiscountableProductPriceInterface: {
+  DiscountablePriceInterface: {
     __resolveType(obj) {
       return obj.__typename;
     }

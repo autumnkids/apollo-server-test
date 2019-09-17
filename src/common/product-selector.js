@@ -12,6 +12,9 @@ const ProductSelector = ({onChange}) => (
       >
         ProductWithClearanceAvailable
       </option>
+      <option key="ProductWithMinPrice" value="ProductWithMinPrice">
+        ProductWithMinPrice
+      </option>
       <option key="ProductWithSets" value="ProductWithSets">
         ProductWithSets
       </option>

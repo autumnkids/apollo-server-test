@@ -47,12 +47,12 @@ interface PriceInterface {
   display: [PriceDisplay]!
 }
 
-interface DiscountableProductPriceInterface {
+interface DiscountablePriceInterface {
   appliedDiscount: Discount
   saleType: Sale
 }
 
-type CustomerPrice implements PriceInterface & DiscountableProductPriceInterface {
+type CustomerPrice implements PriceInterface & DiscountablePriceInterface {
   currency: Currency!
   price: Float
   display: [PriceDisplay]!
@@ -60,7 +60,7 @@ type CustomerPrice implements PriceInterface & DiscountableProductPriceInterface
   saleType: Sale
 }
 
-type ClearancePrice implements PriceInterface & DiscountableProductPriceInterface {
+type ClearancePrice implements PriceInterface & DiscountablePriceInterface {
   currency: Currency!
   price: Float
   display: [PriceDisplay]!
