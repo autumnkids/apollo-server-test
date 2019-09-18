@@ -46,10 +46,6 @@ const getSalePrice = ({product}) => {
   } else if (product.minPrice) {
     min = product.minPrice;
   }
-  let display = [];
-  if (useQuantityPerBox) {
-    display.push('PRICE_PER_AREA_UNIT');
-  }
 
   return {
     __typename: isClearance ? 'ClearancePrice' : 'CustomerPrice',
@@ -57,7 +53,7 @@ const getSalePrice = ({product}) => {
     price,
     min,
     max,
-    display,
+    measurementUnit: useQuantityPerBox ? 'AREA' : 'REGULAR',
     appliedDiscount: {
       appliedDiscountType: 'EVERYDAY',
       everydayDiscount: null,
@@ -91,6 +87,11 @@ const resolvers = {
       return obj.__typename;
     }
   },
+  RangePriceInterface: {
+    __resolveType(obj) {
+      return obj.__typename;
+    }
+  },
   Query: {
     product(root, {id, configuration}) {
       return {
@@ -103,40 +104,23 @@ const resolvers = {
           const useQuantityPerBox =
             product.quantityPerBox && id !== 'WallpaperInDE';
 
-          if (!product.restrictionReason) {
-            const {
-              min: minSalePrice,
-              max: maxSalePrice,
-              ...rest
-            } = getSalePrice({
-              product
+          if (product.restrictionReason) {
+            prices.push({
+              __typename: 'RestrictedPrice',
+              currency: 'USD',
+              price: null,
+              measurementUnit: 'REGULAR',
+              reason: 'SeePriceInCart'
             });
-            if (minSalePrice) {
-              prices.push({
-                ...rest,
-                price: minSalePrice,
-                display: rest.display.concat('MIN')
-              });
-              if (maxSalePrice) {
-                prices.push({
-                  ...rest,
-                  price: maxSalePrice,
-                  display: rest.display.concat('MAX')
-                });
-              }
-            } else {
-              prices.push({
-                ...rest,
-                display: rest.display.concat('DEFAULT')
-              });
-            }
+          } else {
+            prices.push(getSalePrice({product}));
 
             if (product.minimumOrderQuantity) {
               prices.push({
                 __typename: 'CustomerPrice',
                 currency: 'USD',
                 price: product.salePrice / product.minimumOrderQuantity,
-                display: ['PRICE_PER_ITEM']
+                measurementUnit: 'SET'
               });
             }
           }
@@ -148,11 +132,7 @@ const resolvers = {
               price: useQuantityPerBox
                 ? product.listPrice / product.quantityPerBox
                 : product.listPrice,
-              display: [
-                'DEFAULT',
-                'PREVIOUS',
-                useQuantityPerBox ? 'PRICE_PER_AREA_UNIT' : null
-              ].filter(Boolean)
+              measurementUnit: useQuantityPerBox ? 'AREA' : 'REGULAR'
             });
           }
 
@@ -163,39 +143,28 @@ const resolvers = {
               price: useQuantityPerBox
                 ? product.suggestedRetailPrice / product.quantityPerBox
                 : product.suggestedRetailPrice,
-              display: [
-                'DEFAULT',
-                'PREVIOUS',
-                useQuantityPerBox ? 'PRICE_PER_AREA_UNIT' : null
-              ].filter(Boolean)
+              measurementUnit: useQuantityPerBox ? 'AREA' : 'REGULAR'
             });
           }
 
           if (product.clearanceMin) {
-            prices.push({
+            const clearancePrice = {
               __typename: 'ClearancePrice',
               currency: 'USD',
               price: useQuantityPerBox
                 ? product.clearanceMin / product.quantityPerBox
                 : product.clearanceMin,
-              display: [
-                'MIN',
-                useQuantityPerBox ? 'PRICE_PER_AREA_UNIT' : null
-              ].filter(Boolean)
-            });
+              min: useQuantityPerBox
+                ? product.clearanceMin / product.quantityPerBox
+                : product.clearanceMin,
+              measurementUnit: useQuantityPerBox ? 'AREA' : 'REGULAR'
+            };
             if (product.clearanceMax) {
-              prices.push({
-                __typename: 'ClearancePrice',
-                currency: 'USD',
-                price: useQuantityPerBox
-                  ? product.clearanceMax / product.quantityPerBox
-                  : product.clearanceMax,
-                display: [
-                  'MAX',
-                  useQuantityPerBox ? 'PRICE_PER_AREA_UNIT' : null
-                ].filter(Boolean)
-              });
+              clearancePrice.max = useQuantityPerBox
+                ? product.clearanceMax / product.quantityPerBox
+                : product.clearanceMax;
             }
+            prices.push(clearancePrice);
           }
 
           if (id === 'WallpaperInDE') {
@@ -203,7 +172,7 @@ const resolvers = {
               __typename: 'CustomerPrice',
               currency: 'USD',
               price: product.salePrice / product.quantityPerBox,
-              display: ['DEFAULT', 'PRICE_PER_AREA_UNIT']
+              measurementUnit: 'AREA'
             });
           }
 

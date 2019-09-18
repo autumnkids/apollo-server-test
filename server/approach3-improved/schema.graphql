@@ -1,13 +1,3 @@
-enum PriceDisplay {
-  DEFAULT
-  MIN
-  MAX
-  PRICE_PER_AREA_UNIT
-  RESTRICTED
-  PRICE_PER_ITEM
-  PREVIOUS
-}
-
 enum Currency {
   USD
   CAD
@@ -69,7 +59,7 @@ interface DiscountablePriceInterface {
 }
 
 interface RangePriceInterface {
-  min: Float!
+  min: Float
   max: Float
 }
 
@@ -79,7 +69,7 @@ type CustomerPrice implements PriceInterface & DiscountablePriceInterface & Rang
   measurementUnit: Unit!
   appliedDiscount: Discount
   saleType: Sale
-  min: Float!
+  min: Float
   max: Float
 }
 
@@ -89,7 +79,7 @@ type ClearancePrice implements PriceInterface & DiscountablePriceInterface & Ran
   measurementUnit: Unit!
   appliedDiscount: Discount
   saleType: Sale
-  min: Float!
+  min: Float
   max: Float
 }
 
@@ -97,7 +87,7 @@ type EverydayPrice implements PriceInterface & RangePriceInterface {
   currency: Currency!
   price: Float
   measurementUnit: Unit!
-  min: Float!
+  min: Float
   max: Float
 }
 
@@ -105,7 +95,7 @@ type ListPrice implements PriceInterface & RangePriceInterface {
   currency: Currency!
   price: Float
   measurementUnit: Unit!
-  min: Float!
+  min: Float
   max: Float
 }
 
@@ -113,7 +103,7 @@ type SuggestedRetailPrice implements PriceInterface & RangePriceInterface {
   currency: Currency!
   price: Float
   measurementUnit: Unit!
-  min: Float!
+  min: Float
   max: Float
 }
 

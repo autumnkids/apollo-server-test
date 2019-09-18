@@ -7,7 +7,7 @@ export const PRODUCT_PRICE_FRAGMENT = gql`
   fragment ProductPrice on PriceInterface {
     price
     display
-    ... on CustomerPrice {
+    ... on DiscountablePriceInterface {
       appliedDiscount {
         listDiscount {
           percent
@@ -98,22 +98,24 @@ const PriceBlock = ({prices}) => {
       {pricesMap['PricePerItem'] && (
         <Price priceInfo={pricesMap['PricePerItem']} />
       )}
-      {pricesMap['ListPrice'] && (
-        <span className="PriceBlock-strikethrough">
-          {'List: '}
-          <Price priceInfo={pricesMap['ListPrice']} />
-        </span>
-      )}
-      {pricesMap['SuggestedRetailPrice'] && (
-        <span className="PriceBlock-strikethrough">
-          {'RRP: '}
-          <Price priceInfo={pricesMap['SuggestedRetailPrice']} />
-        </span>
-      )}
       {pricesMap['Discount'] && (
-        <span className="PriceBlock-percentageOff">
-          {pricesMap['Discount']}% Off
-        </span>
+        <>
+          {pricesMap['ListPrice'] && (
+            <span className="PriceBlock-strikethrough">
+              {'List: '}
+              <Price priceInfo={pricesMap['ListPrice']} />
+            </span>
+          )}
+          {pricesMap['SuggestedRetailPrice'] && (
+            <span className="PriceBlock-strikethrough">
+              {'RRP: '}
+              <Price priceInfo={pricesMap['SuggestedRetailPrice']} />
+            </span>
+          )}
+          <span className="PriceBlock-percentageOff">
+            {pricesMap['Discount']}% Off
+          </span>
+        </>
       )}
       {pricesMap['MeasurementPrice'] && (
         <span className="PriceBlock-secondaryPrice">
