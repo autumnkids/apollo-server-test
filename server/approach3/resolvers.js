@@ -208,6 +208,119 @@ const resolvers = {
           }
 
           return prices;
+        },
+        unitPrice() {
+          const product = products[id];
+          if (product.restrictionReason) {
+            return null;
+          }
+          return {
+            currency: 'USD',
+            customerPrice: product.salePrice,
+            listPrice: product.listPrice,
+            suggestedRetailPrice: product.suggestedRetailPrice,
+            appliedDiscount: {
+              appliedDiscountType: 'EVERYDAY',
+              everydayDiscount: null,
+              listDiscount:
+                product.listPrice > product.salePrice
+                  ? {
+                      amount: product.listPrice - product.salePrice,
+                      percent:
+                        ((product.listPrice - product.salePrice) /
+                          product.listPrice) *
+                        100
+                    }
+                  : null,
+              suggestedRetailDiscount:
+                product.suggestedRetailPrice - product.salePrice
+                  ? {
+                      amount: product.suggestedRetailPrice - product.salePrice,
+                      percent:
+                        ((product.suggestedRetailPrice - product.salePrice) /
+                          product.suggestedRetailPrice) *
+                        100
+                    }
+                  : null
+            },
+            saleType: product.saleType || null
+          };
+        },
+        itemPrice() {
+          const product = products[id];
+          if (!product.quantityPerBox || product.restrictionReason) {
+            return null;
+          }
+          return {
+            currency: 'USD',
+            customerPrice: product.salePrice / product.quantityPerBox,
+            listPrice: product.listPrice / product.quantityPerBox,
+            suggestedRetailPrice:
+              product.suggestedRetailPrice / product.quantityPerBox,
+            appliedDiscount: {
+              appliedDiscountType: 'EVERYDAY',
+              everydayDiscount: null,
+              listDiscount:
+                product.listPrice > product.salePrice
+                  ? {
+                      amount:
+                        (product.listPrice - product.salePrice) /
+                        product.quantityPerBox,
+                      percent:
+                        ((product.listPrice - product.salePrice) /
+                          product.listPrice) *
+                        100
+                    }
+                  : null,
+              suggestedRetailDiscount:
+                product.suggestedRetailPrice > product.salePrice
+                  ? {
+                      amount:
+                        (product.suggestedRetailPrice - product.salePrice) /
+                        product.quantityPerBox,
+                      percent:
+                        (product.suggestedRetailPrice - product.salePrice) /
+                        product.suggestedRetailPrice
+                    }
+                  : null
+            },
+            saleType: product.saleType || null
+          };
+        },
+        quantityPrice({quantity = 1}) {
+          const product = products[id];
+          if (product.restrictionReason) {
+            return null;
+          }
+          return {
+            currency: 'USD',
+            customerPrice: product.salePrice * quantity,
+            listPrice: product.listPrice * quantity,
+            suggestedRetailPrice: product.suggestedRetailPrice * quantity,
+            appliedDiscount: {
+              appliedDiscountType: 'EVERYDAY',
+              everydayDiscount: null,
+              listDiscount:
+                product.listPrice > product.salePrice
+                  ? {
+                      amount: product.listPrice - product.salePrice,
+                      percent:
+                        (product.listPrice - product.salePrice) /
+                        product.listPrice
+                    }
+                  : null,
+              suggestedRetailDiscount:
+                product.suggestedRetailPrice > product.salePrice
+                  ? {
+                      amount: product.suggestedRetailPrice - product.salePrice,
+                      percent:
+                        (product.suggestedRetailPrice - product.salePrice) /
+                        product.suggestedRetailPrice
+                    }
+                  : null
+            },
+            saleType: product.saleType || null
+          };
         }
       };
     }

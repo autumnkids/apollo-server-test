@@ -86,6 +86,16 @@ type SuggestedRetailPrice implements PriceInterface {
   display: [PriceDisplay]!
 }
 
+type ProductPrice {
+  currency: Currency!
+  customerPrice: Float!
+  everydayPrice: Float!
+  listPrice: Float
+  suggestedRetailPrice: Float
+  appliedDiscount: Discount
+  saleType: Sale
+}
+
 enum ProductId {
   NormalProduct
   ProductWithClearanceAvailable
@@ -107,6 +117,9 @@ input ProductConfiguration {
 type Product {
   id: ProductId!
   prices: [PriceInterface]!
+  unitPrice: ProductPrice
+  itemPrice: ProductPrice
+  quantityPrice(quantity: Int): ProductPrice
 }
 
 type Query {
