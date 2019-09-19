@@ -19,22 +19,15 @@ enum PriceDescriptor {
   UnitPrice
 }
 
-enum SaleEnum {
-  OnSale
-  Closeout
-}
-
 interface PriceInterface {
   priceDescriptor: PriceDescriptor!
   unitType: Unit!
-  saleType: SaleEnum
 }
 
 type SimplePrice implements PriceInterface {
   priceDescriptor: PriceDescriptor!
   unitType: Unit!
   price: Float!
-  saleType: SaleEnum
 }
 
 type RangePrice implements PriceInterface {
@@ -42,7 +35,6 @@ type RangePrice implements PriceInterface {
   unitType: Unit!
   min: Float!
   max: Float
-  saleType: SaleEnum
 }
 
 type PriceDiscount {
@@ -74,11 +66,15 @@ enum ProductId {
   OnSaleProduct
 }
 
+input ProductConfiguration {
+  quantity: Int
+}
+
 type Product {
   id: ProductId!
   prices(useFor: PriceUseCase): [Price]!
 }
 
 type Query {
-  product(id: ProductId): Product
+  product(id: ProductId, configuration: ProductConfiguration): Product
 }

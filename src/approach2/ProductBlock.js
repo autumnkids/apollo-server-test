@@ -2,24 +2,27 @@ import React from 'react';
 import gql from 'graphql-tag';
 import {useQuery} from '@apollo/react-hooks';
 import PriceBlock from './PriceBlock';
+import SquareFootageCalculator from './SquareFootageCalculator';
 import RandomPrice from './RandomPrice';
 import ProductSelector from '../common/product-selector';
 
 const PRODUCT_QUERY = gql`
-  query product($id: ProductId!) {
-    product(id: $id) {
+  query product($id: ProductId!, $quantity: Int) {
+    product(id: $id, configuration: {quantity: $quantity}) {
       prices {
         ...PriceBlock
+        ...SquareFootageCalculator
       }
     }
   }
 
   ${PriceBlock.fragment}
+  ${SquareFootageCalculator.fragment}
 `;
 
 const ProductBlock = () => {
   const {loading, error, data, refetch} = useQuery(PRODUCT_QUERY, {
-    variables: {id: 'NormalProduct'},
+    variables: {id: 'NormalProduct', quantity: 1},
     returnPartialData: true
   });
 
@@ -39,6 +42,7 @@ const ProductBlock = () => {
             <PriceBlock prices={data.product.prices} />
             <div>Somwhere else on the page...</div>
             <RandomPrice prices={data.product.prices} />
+            <SquareFootageCalculator prices={data.product.prices} />
           </>
         );
       })()}

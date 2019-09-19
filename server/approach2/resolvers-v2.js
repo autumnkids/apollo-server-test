@@ -18,7 +18,7 @@ const getUnitType = ({id, key}) => {
   }
 };
 
-const resolvePricingData = product => {
+const resolvePricingData = ({product, quantity}) => {
   let savedPercent;
   const pricingData = Object.keys(product)
     .map(key => {
@@ -42,6 +42,8 @@ const resolvePricingData = product => {
         };
         if (savedAmount) {
           savedPercent = (savedAmount / product.listPrice) * 100;
+        }
+        if (product.id === 'OnSaleProduct') {
           salePrice.priceDescriptor = 'OnSalePrice';
         }
         if (product.maxPrice || maxPrice) {
@@ -100,6 +102,13 @@ const resolvePricingData = product => {
       savedPercent
     });
   }
+  if (product.quantityPerBox && quantity) {
+    pricingData.push({
+      price: product.salePrice * quantity,
+      unitType: 'REGULAR',
+      priceDescriptor: 'ConfiguredPrice'
+    });
+  }
   return pricingData;
 };
 
@@ -125,13 +134,14 @@ const resolvers = {
     }
   },
   Query: {
-    product(root, {id}) {
+    product(root, {id, configuration}) {
       return {
         id() {
           return id;
         },
         prices() {
-          return resolvePricingData(products[id]);
+          const quantity = configuration ? configuration.quantity : 1;
+          return resolvePricingData({product: products[id], quantity});
         }
       };
     }
