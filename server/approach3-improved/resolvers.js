@@ -176,6 +176,22 @@ const resolvers = {
             });
           }
 
+          if (product.quantityPerBox && configuration) {
+            prices.push({
+              __typename: 'CustomerPrice',
+              currency: 'USD',
+              price: product.salePrice,
+              measurementUnit: 'REGULAR'
+            });
+            const {quantity} = configuration;
+            prices.push({
+              __typename: 'CustomerPrice',
+              currency: 'USD',
+              price: product.salePrice * quantity,
+              measurementUnit: 'REGULAR'
+            });
+          }
+
           return prices;
         }
       };
