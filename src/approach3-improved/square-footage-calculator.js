@@ -1,6 +1,5 @@
 import React from 'react';
 import gql from 'graphql-tag';
-import BasePrice from '../common/base-price';
 
 export const SQUARE_FOOTAGE_CALCULATOR_FRAGMENT = gql`
   fragment SquareFootageCalculator on PriceInterface {
@@ -17,7 +16,6 @@ const SquareFootageCalculator = ({prices}) => {
       priceInfo.__typename === 'CustomerPrice' &&
       priceInfo.measurementUnit === 'REGULAR'
   );
-  console.log(customerPrices);
   if (customerPrices.length === 2) {
     return (
       <>

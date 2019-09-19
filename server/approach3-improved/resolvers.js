@@ -46,6 +46,12 @@ const getSalePrice = ({product}) => {
   } else if (product.minPrice) {
     min = product.minPrice;
   }
+  let measurementUnit = 'REGULAR';
+  if (useQuantityPerBox) {
+    measurementUnit = 'AREA';
+  } else if (id === 'WallpaperInDE') {
+    measurementUnit = 'ROLL';
+  }
 
   return {
     __typename: isClearance ? 'ClearancePrice' : 'CustomerPrice',
@@ -53,7 +59,7 @@ const getSalePrice = ({product}) => {
     price,
     min,
     max,
-    measurementUnit: useQuantityPerBox ? 'AREA' : 'REGULAR',
+    measurementUnit,
     appliedDiscount: {
       appliedDiscountType: 'EVERYDAY',
       everydayDiscount: null,
