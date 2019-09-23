@@ -9,7 +9,19 @@ import ProductSelector from '../common/product-selector';
 const PRODUCT_QUERY = gql`
   query product($id: ProductId!, $quantity: Int) {
     product(id: $id, configuration: {quantity: $quantity}) {
-      prices {
+      prices(
+        filter: [
+          OnSalePrice
+          SalePrice
+          ListPrice
+          SuggestedRetailPrice
+          ClearancePrice
+          SmallestPurchasablePrice
+          ConfiguredPrice
+          PricePerItem
+          UnitPrice
+        ]
+      ) {
         ...PriceBlock
         ...SquareFootageCalculator
       }
@@ -23,7 +35,7 @@ const PRODUCT_QUERY = gql`
 const ProductBlock = () => {
   const {loading, error, data, refetch} = useQuery(PRODUCT_QUERY, {
     variables: {id: 'NormalProduct', quantity: 1},
-    returnPartialData: true
+    returnPartialData: true,
   });
 
   return (

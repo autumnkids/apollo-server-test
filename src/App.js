@@ -2,8 +2,8 @@ import React from 'react';
 import ApolloClient from 'apollo-boost';
 import {ApolloProvider} from '@apollo/react-hooks';
 // import ProductBlock from './approach1.1/product-block';
-import ProductBlock from './approach1.2/product-block';
-// import ProductBlock from './approach2/ProductBlock';
+// import ProductBlock from './approach1.2/product-block';
+import ProductBlock from './approach2/ProductBlock';
 // import ProductBlock from './approach3/product-block';
 // import ProductBlock from './approach3-improved/product-block';
 

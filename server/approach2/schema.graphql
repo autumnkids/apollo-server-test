@@ -47,11 +47,6 @@ type RestrictedPrice {
 
 union Price = SimplePrice | RangePrice | RestrictedPrice | PriceDiscount
 
-enum PriceUseCase {
-  PriceBlock
-  ProductDetails
-}
-
 enum ProductId {
   NormalProduct
   ProductWithClearanceAvailable
@@ -72,7 +67,7 @@ input ProductConfiguration {
 
 type Product {
   id: ProductId!
-  prices(useFor: PriceUseCase): [Price]!
+  prices(filter: [PriceDescriptor]!): [Price]!
 }
 
 type Query {
