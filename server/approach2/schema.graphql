@@ -9,7 +9,7 @@ enum Unit {
 
 enum PriceDescriptor {
   OnSalePrice
-  SalePrice
+  NormalPrice
   ListPrice
   SuggestedRetailPrice
   ClearancePrice

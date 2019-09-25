@@ -12,7 +12,7 @@ const PRODUCT_QUERY = gql`
       prices(
         filter: [
           OnSalePrice
-          SalePrice
+          NormalPrice
           ListPrice
           SuggestedRetailPrice
           ClearancePrice

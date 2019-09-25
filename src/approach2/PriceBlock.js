@@ -37,7 +37,7 @@ function PriceBlock({prices}) {
         <RestrictedPrice price={pricesHash['RestrictedPrice']} />
       ) : (
         <SalePriceDisplay
-          price={pricesHash['SalePrice'] || pricesHash['OnSalePrice']}
+          price={pricesHash['NormalPrice'] || pricesHash['OnSalePrice']}
         />
       )}
       {pricesHash['PriceDiscount'] && (

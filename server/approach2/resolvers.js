@@ -38,7 +38,7 @@ const resolvePricingData = ({product, quantity}) => {
         }
         const salePrice = {
           unitType,
-          priceDescriptor: 'SalePrice'
+          priceDescriptor: 'NormalPrice'
         };
         if (savedAmount) {
           savedPercent = (savedAmount / product.listPrice) * 100;
