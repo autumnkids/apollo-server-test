@@ -1,127 +1,52 @@
 const {products} = require('../common/data');
 
-const getUnitType = ({id, key}) => {
-  switch (id) {
-    case 'ProductWithSets': {
-      if (key === 'minimumOrderQuantity') {
-        return 'SET';
-      }
-      return 'REGULAR';
-    }
-    case 'FlooringProduct':
-      if (key === 'quantityPerBox') {
-        return 'REGULAR';
-      }
-      return 'AREA';
-    default:
-      return 'REGULAR';
-  }
-};
-
-const resolvePricingData = ({product, quantity}) => {
-  let savedPercent;
-  const pricingData = Object.keys(product)
-    .map(key => {
-      const unitType = getUnitType({id: product.id, key});
-      if (key === 'salePrice') {
-        const savedAmount = product.listPrice
-          ? product.listPrice - product.salePrice
-          : 0;
-        let price, maxPrice;
-        if (product.quantityPerBox) {
-          price = product[key] / product.quantityPerBox;
-        } else if (product.clearanceItems) {
-          price = product.clearanceItems[0].price;
-          maxPrice = product.clearanceItems[1].price;
-        } else {
-          price = product[key];
-        }
-        const salePrice = {
-          unitType,
-          priceDescriptor: 'NormalPrice'
-        };
-        if (savedAmount) {
-          savedPercent = (savedAmount / product.listPrice) * 100;
-        }
-        if (product.id === 'OnSaleProduct') {
-          salePrice.priceDescriptor = 'OnSalePrice';
-        }
-        if (product.maxPrice || maxPrice) {
-          salePrice.min = price;
-          salePrice.max = product.maxPrice || maxPrice;
-        } else if (product.minPrice) {
-          salePrice.min = product.minPrice;
-        } else {
-          salePrice.price = price;
-        }
-        return salePrice;
-      } else if (key === 'listPrice') {
-        return {
-          price: product[key],
-          unitType,
-          priceDescriptor: 'ListPrice'
-        };
-      } else if (key === 'suggestedRetailPrice') {
-        return {
-          price: product[key],
-          unitType,
-          priceDescriptor: 'SuggestedRetailPrice'
-        };
-      } else if (key === 'clearanceMin') {
-        const clearancePrice = {
-          min: product[key],
-          unitType,
-          priceDescriptor: 'ClearancePrice'
-        };
-        if (product.clearanceMax) {
-          clearancePrice.max = product.clearanceMax;
-        }
-        return clearancePrice;
-      } else if (key === 'minimumOrderQuantity') {
-        return {
-          price: product.salePrice / 2,
-          unitType,
-          priceDescriptor: 'PricePerItem'
-        };
-      } else if (key === 'quantityPerBox') {
-        return {
-          price: product.salePrice,
-          unitType,
-          priceDescriptor: 'SmallestPurchasablePrice'
-        };
-      } else if (key === 'restrictionReason') {
-        return {
-          restrictionReason: product[key],
-          priceDescriptor: 'RestrictedPrice'
-        };
-      }
-    })
-    .filter(Boolean);
-  if (savedPercent) {
-    pricingData.push({
-      savedPercent
-    });
-  }
-  if (product.quantityPerBox && quantity) {
-    pricingData.push({
-      price: product.salePrice * quantity,
-      unitType: 'REGULAR',
-      priceDescriptor: 'ConfiguredPrice'
-    });
-  }
-  return pricingData;
-};
-
 const resolvers = {
-  Price: {
+  SalePrice: {
     __resolveType(obj) {
       if (obj.min) {
         return 'RangePrice';
-      } else if (obj.restrictionReason) {
-        return 'RestrictedPrice';
-      } else if (obj.savedPercent) {
-        return 'PriceDiscount';
       }
+      if (obj.restrictionReason) {
+        return 'RestrictedPrice';
+      }
+      return 'SimplePrice';
+    }
+  },
+  ListPrice: {
+    __resolveType(obj) {
+      return 'SimplePrice';
+    }
+  },
+  SuggestedRetailPrice: {
+    __resolveType(obj) {
+      return 'SimplePrice';
+    }
+  },
+  ClearancePrice: {
+    __resolveType(obj) {
+      if (obj.min) {
+        return 'RangePrice';
+      }
+      return 'SimplePrice';
+    }
+  },
+  UnitPrice: {
+    __resolveType(obj) {
+      return 'SimplePrice';
+    }
+  },
+  PerItemPrice: {
+    __resolveType(obj) {
+      return 'SimplePrice';
+    }
+  },
+  MeasurementPrice: {
+    __resolveType(obj) {
+      return 'SimplePrice';
+    }
+  },
+  ConfiguredPrice: {
+    __resolveType(obj) {
       return 'SimplePrice';
     }
   },
@@ -139,9 +64,187 @@ const resolvers = {
         id() {
           return id;
         },
-        prices() {
-          const quantity = configuration ? configuration.quantity : 1;
-          return resolvePricingData({product: products[id], quantity});
+        price() {
+          const product = products[id];
+          return {
+            salePrice() {
+              if (product.restrictionReason) {
+                return {
+                  restrictionReason: product.restrictionReason
+                };
+              }
+              if (product.clearanceItems) {
+                let min = 9999,
+                  max = -9999;
+                product.clearanceItems.forEach(item => {
+                  if (item.price < min) {
+                    min = item.price;
+                  }
+                  if (item.price > max) {
+                    max = item.price;
+                  }
+                });
+                if (min < max) {
+                  return {
+                    min,
+                    max,
+                    unitType: 'REGULAR'
+                  };
+                }
+                return {
+                  min,
+                  unitType: 'REGULAR'
+                };
+              }
+              if (product.maxPrice) {
+                return {
+                  min: product.salePrice,
+                  max: product.maxPrice,
+                  unitType: 'REGULAR'
+                };
+              }
+              if (product.minPrice) {
+                return {
+                  min: product.minPrice,
+                  unitType: 'REGULAR'
+                };
+              }
+              if (product.quantityPerBox && id !== 'WallpaperInDE') {
+                return {
+                  price: product.salePrice / product.quantityPerBox,
+                  unitType: 'AREA'
+                };
+              }
+              const price =
+                id !== 'WallpaperInDE' &&
+                configuration &&
+                configuration.quantity
+                  ? product.salePrice * configuration.quantity
+                  : product.salePrice;
+              return {
+                price,
+                unitType: 'REGULAR'
+              };
+            },
+            listPrice() {
+              if (product.listPrice) {
+                if (product.quantityPerBox) {
+                  return {
+                    price: product.listPrice / product.quantityPerBox,
+                    unitType: 'AREA'
+                  };
+                }
+                const price =
+                  configuration && configuration.quantity
+                    ? product.listPrice * configuration.quantity
+                    : product.listPrice;
+                return {
+                  price,
+                  unitType: product.quantityPerBox ? 'AREA' : 'REGULAR'
+                };
+              }
+              return null;
+            },
+            suggestedRetailPrice() {
+              if (product.suggestedRetailPrice) {
+                if (product.quantityPerBox) {
+                  return {
+                    price:
+                      product.suggestedRetailPrice / product.quantityPerBox,
+                    unitType: 'AREA'
+                  };
+                }
+                const price =
+                  configuration && configuration.quantity
+                    ? product.suggestedRetailPrice * configuration.quantity
+                    : product.suggestedRetailPrice;
+                return {
+                  price,
+                  unitType: product.quantityPerBox ? 'AREA' : 'REGULAR'
+                };
+              }
+              return null;
+            },
+            clearancePrice() {
+              if (product.clearanceMax) {
+                return {
+                  min: product.clearanceMin,
+                  max: product.clearanceMax,
+                  unitType: product.quantityPerBox ? 'AREA' : 'REGULAR'
+                };
+              }
+              if (product.clearanceMin) {
+                return {
+                  min: product.clearanceMin,
+                  unitType: product.quantityPerBox ? 'AREA' : 'REGULAR'
+                };
+              }
+              if (product.clearancePrice) {
+                return {
+                  price: product.clearancePrice,
+                  unitType: product.quantityPerBox ? 'AREA' : 'REGULAR'
+                };
+              }
+              return null;
+            },
+            unitPrice() {
+              if (product.salePrice) {
+                return {
+                  price: product.salePrice,
+                  unitType: 'REGULAR'
+                };
+              }
+              return null;
+            },
+            perItemPrice() {
+              if (product.minimumOrderQuantity > 1) {
+                return {
+                  price: product.salePrice / product.minimumOrderQuantity,
+                  unitType: 'SET'
+                };
+              }
+              return null;
+            },
+            measurementPrice() {
+              if (id === 'WallpaperInDE' && product.quantityPerBox) {
+                return {
+                  price: product.salePrice / product.quantityPerBox,
+                  unitType: 'AREA'
+                };
+              }
+              return null;
+            },
+            configuredPrice() {
+              if (
+                configuration &&
+                configuration.quantity &&
+                product.salePrice
+              ) {
+                return {
+                  price: product.salePrice * configuration.quantity,
+                  unitType: 'REGULAR'
+                };
+              }
+              return null;
+            },
+            discount() {
+              if (product.listPrice - product.salePrice > 0) {
+                return {
+                  savedPercent:
+                    ((product.listPrice - product.salePrice) /
+                      product.listPrice) *
+                    100
+                };
+              }
+              return null;
+            },
+            saleType() {
+              if (product.saleType) {
+                return product.saleType;
+              }
+              return 'REGULAR';
+            }
+          };
         }
       };
     }

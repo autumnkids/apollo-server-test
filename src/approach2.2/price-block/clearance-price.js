@@ -19,11 +19,12 @@ const ClearancePrice = ({price}) =>
     <p>
       {'Open Box Price: '}
       {(() => {
-        if (price.__typename === 'SimplePrice') {
-          return <SimplePrice priceInfo={price.clearancePrice} />;
+        const {clearancePrice} = price;
+        if (clearancePrice.__typename === 'SimplePrice') {
+          return <SimplePrice priceInfo={clearancePrice} />;
         }
-        if (price.__typename === 'RangePrice') {
-          return <RangePrice priceInfo={price.clearancePrice} />;
+        if (clearancePrice.__typename === 'RangePrice') {
+          return <RangePrice priceInfo={clearancePrice} />;
         }
         return null;
       })()}

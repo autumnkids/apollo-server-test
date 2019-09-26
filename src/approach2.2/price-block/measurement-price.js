@@ -14,7 +14,7 @@ export const MEASUREMENT_PRICE_FRAGMENT = gql`
 const MeasurementPrice = ({price}) =>
   price.measurementPrice && (
     <p>
-      <SimplePrice priceInfo={price} />
+      <SimplePrice priceInfo={price.measurementPrice} />
     </p>
   );
 

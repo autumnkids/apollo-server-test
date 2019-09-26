@@ -7,63 +7,45 @@ enum Unit {
   REGULAR
 }
 
-enum Sale {
-  ON_SALE
-  CLOSEOUT
-  REGULAR
+enum PriceDescriptor {
+  OnSalePrice
+  NormalPrice
+  ListPrice
+  SuggestedRetailPrice
+  ClearancePrice
+  SmallestPurchasablePrice
+  ConfiguredPrice
+  PricePerItem
+  UnitPrice
 }
 
 interface PriceInterface {
+  priceDescriptor: PriceDescriptor!
   unitType: Unit!
 }
 
 type SimplePrice implements PriceInterface {
-  price: Float!
+  priceDescriptor: PriceDescriptor!
   unitType: Unit!
+  price: Float!
 }
 
 type RangePrice implements PriceInterface {
+  priceDescriptor: PriceDescriptor!
+  unitType: Unit!
   min: Float!
   max: Float
-  unitType: Unit!
-}
-
-type RestrictedPrice {
-  restrictionReason: String!
 }
 
 type PriceDiscount {
   savedPercent: Float!
 }
 
-union SalePrice = SimplePrice | RangePrice | RestrictedPrice
-
-union ListPrice = SimplePrice
-
-union SuggestedRetailPrice = SimplePrice
-
-union ClearancePrice = SimplePrice | RangePrice
-
-union UnitPrice = SimplePrice
-
-union PerItemPrice = SimplePrice
-
-union MeasurementPrice = SimplePrice
-
-union ConfiguredPrice = SimplePrice
-
-type Price {
-  salePrice: SalePrice!
-  listPrice: ListPrice
-  suggestedRetailPrice: SuggestedRetailPrice
-  clearancePrice: ClearancePrice
-  unitPrice: UnitPrice
-  perItemPrice: PerItemPrice
-  measurementPrice: MeasurementPrice
-  configuredPrice: ConfiguredPrice
-  discount: PriceDiscount
-  saleType: Sale!
+type RestrictedPrice {
+  restrictionReason: String!
 }
+
+union Price = SimplePrice | RangePrice | RestrictedPrice | PriceDiscount
 
 enum ProductId {
   NormalProduct
@@ -85,9 +67,9 @@ input ProductConfiguration {
 
 type Product {
   id: ProductId!
-  price: Price!
+  prices(filter: [PriceDescriptor]!): [Price]!
 }
 
 type Query {
-  product(id: ProductId!, configuration: ProductConfiguration): Product!
+  product(id: ProductId, configuration: ProductConfiguration): Product
 }
